@@ -1,20 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UnityEngine.SceneManagement;
-
-//TODO: Created EnhancedFog namespace. Put EhnacedFogMode and EnhancedFog within the EnhancedFog namespace.
-
-public enum EnhancedFogMode {
-    Linear,
-    Exponential,
-    ExponentialSquared
-}
-
-//TODO: Loading EnhancedFogSettings currently uses Unity Editor asset path. This will not work with
-//standalone builds. Need to rewrite so that m_currentFogSettings is initialized properly for standalone builds.
+﻿using UnityEngine;
 
 public static class EnhancedFog {
     public static class ShaderPropertyID {
@@ -31,24 +15,6 @@ public static class EnhancedFog {
     private static float m_density = 0.01f;
     private static float m_startDistance = 0.0f;
     private static float m_endDistance = 100.0f;
-
-    //TODO: Move code in #if UNITY_EDITOR somewhere else
-#if UNITY_EDITOR
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void OnRuntimeMethodLoad() {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
-        if (!m_currentFogSettings) {
-            currentFogSettings = EnhancedFogLoader.GetFogSettings(scene);
-        }
-
-        if (mode == LoadSceneMode.Single) {
-            currentFogSettings = EnhancedFogLoader.GetFogSettings(scene);
-        }
-    }
-#endif
 
     public static EnhancedFogSettings currentFogSettings {
         set {

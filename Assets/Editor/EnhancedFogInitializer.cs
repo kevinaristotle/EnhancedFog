@@ -13,6 +13,7 @@ public static class EnhancedFogInitializer {
     static EnhancedFogInitializer() {
         Debug.Log("EnhancedFogInitializer");
         EditorSceneManager.sceneOpened += OnSceneOpened;
+        SceneManager.sceneLoaded += OnSceneLoaded;
         EditorApplication.update += InitialUpdate;
         EditorApplication.playModeStateChanged += OnPlaymodeStateChanged;
     }
@@ -29,6 +30,12 @@ public static class EnhancedFogInitializer {
         Debug.Log("SceneName = " + scene.name);
         fogSettings = GetFogSettings(scene);
         RenderFogSettings();
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        if (mode == LoadSceneMode.Single) {
+            EnhancedFog.currentFogSettings = EnhancedFogLoader.GetFogSettings(scene);
+        }
     }
 
     private static void OnPlaymodeStateChanged(PlayModeStateChange state) {
