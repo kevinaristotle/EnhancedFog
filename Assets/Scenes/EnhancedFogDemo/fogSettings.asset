@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d064b627c9562984e9ef0c2987573189, type: 3}
   m_Name: fogSettings
   m_EditorClassIdentifier: 
-  m_isEnabled: 1
-  m_color: {r: 0, g: 0.38025475, b: 1, a: 1}
-  m_mode: 2
-  m_density: 0.025
-  m_startDistance: 0
-  m_endDistance: 0
+  isEnabled: 1
+  color: {r: 0, g: 0, b: 1, a: 1}
+  mode: 0
+  density: 0
+  startDistance: 0
+  endDistance: 100
