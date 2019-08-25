@@ -2,15 +2,19 @@
 
 public static class EnhancedFog {
     public static class ShaderPropertyID {
+        public static readonly int g_EnhancedFogGradientTex = Shader.PropertyToID("g_EnhancedFogGradientTex");
         public static readonly int g_EnhancedFogColor = Shader.PropertyToID("g_EnhancedFogColor");
         public static readonly int g_EnhancedFogParams = Shader.PropertyToID("g_EnhancedFogParams");
+        public static readonly int g_EnhancedFogColorMode = Shader.PropertyToID("g_EnhancedFogColorMode");
     }
 
     private static EnhancedFogSettingsContainer m_fogSettingsContainer;
     private static EnhancedFogSettings m_currentFogSettings;
 
     private static bool m_isEnabled = false;
+    private static EnhancedFogColorMode m_colorMode = EnhancedFogColorMode.SingleColor;
     private static Color m_color = Color.gray;
+    private static Texture2D m_gradientTexture;
     private static EnhancedFogMode m_mode = EnhancedFogMode.Linear;
     private static float m_density = 0.01f;
     private static float m_startDistance = 0.0f;
@@ -23,7 +27,9 @@ public static class EnhancedFog {
             if (m_currentFogSettings != null) {
                 Debug.Log("EnhancedFog: loaded currentFogSettings");
                 isEnabled = m_currentFogSettings.isEnabled;
+                colorMode = m_currentFogSettings.colorMode;
                 color = m_currentFogSettings.color;
+                gradientTexture = m_currentFogSettings.gradientTexture;
                 mode = m_currentFogSettings.mode;
                 density = m_currentFogSettings.density;
                 startDistance = m_currentFogSettings.startDistance;
@@ -40,11 +46,27 @@ public static class EnhancedFog {
         }
     }
 
+    public static EnhancedFogColorMode colorMode {
+        get { return m_colorMode; }
+        set {
+            m_colorMode = value;
+            Shader.SetGlobalFloat(ShaderPropertyID.g_EnhancedFogColorMode, (float)value);
+        }
+    }
+
     public static Color color {
         get { return m_color; }
         set {
             m_color = value;
             Shader.SetGlobalColor(ShaderPropertyID.g_EnhancedFogColor, value);
+        }
+    }
+
+    public static Texture2D gradientTexture {
+        get { return m_gradientTexture; }
+        set {
+            m_gradientTexture = value;
+            Shader.SetGlobalTexture(ShaderPropertyID.g_EnhancedFogGradientTex, value);
         }
     }
 

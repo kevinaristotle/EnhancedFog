@@ -1,8 +1,10 @@
 #ifndef ENHANCED_FOG_CGINC
 #define ENHANCED_FOG_CGINC
 
+uniform sampler2D g_EnhancedFogGradientTex;
 uniform fixed4 g_EnhancedFogColor;
 uniform fixed4 g_EnhancedFogParams;
+uniform fixed g_EnhancedFogColorMode;
 
 inline float CalculateFogFactor(float coords) {
     #if defined(ENHANCEDFOG_LINEAR)
@@ -23,7 +25,9 @@ inline float CalculateFogFactor(float coords) {
 float3 ApplyFog(fixed3 color, float3 worldPos) {
 	float viewDistance = length(_WorldSpaceCameraPos - worldPos);
     float fogFactor = CalculateFogFactor(viewDistance);
-	return lerp(g_EnhancedFogColor.rgb, color, fogFactor);
+    float3 gradientColor = tex2D(g_EnhancedFogGradientTex, float2(1 - fogFactor, 0)).rgb;
+    float3 fogColor = lerp(g_EnhancedFogColor.rgb, gradientColor, g_EnhancedFogColorMode);
+	return lerp(fogColor, color, fogFactor);
 }
 
 #endif

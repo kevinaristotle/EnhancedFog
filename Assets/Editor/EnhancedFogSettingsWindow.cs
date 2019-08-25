@@ -14,7 +14,9 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private static readonly string windowTitle = "Enhanced Fog";
 
     private static readonly GUIContent isEnabledText = new GUIContent("Fog Enabled", "");
+    private static readonly GUIContent colorModeText = new GUIContent("Color Mode", "");
     private static readonly GUIContent colorText = new GUIContent("Color", "");
+    private static readonly GUIContent gradientTextureText = new GUIContent("Gradient Texture", "");
     private static readonly GUIContent modeText = new GUIContent("Mode", "");
     private static readonly GUIContent densityText = new GUIContent("Density", "");
     private static readonly GUIContent startDistanceText = new GUIContent("Start Distance", "");
@@ -27,7 +29,9 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private GUIContent headerContent;
 
     private bool isEnabled;
+    private EnhancedFogColorMode colorMode;
     private Color color;
+    private Texture2D gradientTexture;
     private EnhancedFogMode mode;
     private float startDistance;
     private float endDistance;
@@ -68,7 +72,12 @@ public class EnhancedFogSettingsWindow : EditorWindow {
 
         EditorGUI.BeginChangeCheck(); {
             isEnabled = EditorGUILayout.Toggle(isEnabledText, activeEnhancedFogSettings.isEnabled);
-            color = EditorGUILayout.ColorField(colorText, activeEnhancedFogSettings.color);
+            colorMode = (EnhancedFogColorMode)EditorGUILayout.EnumPopup(colorModeText, activeEnhancedFogSettings.colorMode);
+            if (activeEnhancedFogSettings.colorMode == EnhancedFogColorMode.SingleColor) {
+                color = EditorGUILayout.ColorField(colorText, activeEnhancedFogSettings.color);
+            } else {
+                gradientTexture = EditorGUILayout.ObjectField(gradientTextureText, gradientTexture, typeof(Texture2D)) as Texture2D;
+            }
             mode = (EnhancedFogMode)EditorGUILayout.EnumPopup(modeText, activeEnhancedFogSettings.mode);
             if (activeEnhancedFogSettings.mode == EnhancedFogMode.Linear) {
                 startDistance = EditorGUILayout.FloatField(startDistanceText, activeEnhancedFogSettings.startDistance);
@@ -79,7 +88,9 @@ public class EnhancedFogSettingsWindow : EditorWindow {
         } if (EditorGUI.EndChangeCheck()) {
             Undo.RecordObject(activeEnhancedFogSettings, "Changed Enhanced Fog Settings");
             activeEnhancedFogSettings.isEnabled = isEnabled;
+            activeEnhancedFogSettings.colorMode = colorMode;
             activeEnhancedFogSettings.color = color;
+            activeEnhancedFogSettings.gradientTexture = gradientTexture;
             activeEnhancedFogSettings.mode = mode;
             activeEnhancedFogSettings.startDistance = startDistance;
             activeEnhancedFogSettings.endDistance = endDistance;
