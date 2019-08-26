@@ -16,11 +16,14 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private static readonly GUIContent isEnabledText = new GUIContent("Fog Enabled", "");
     private static readonly GUIContent colorModeText = new GUIContent("Color Mode", "");
     private static readonly GUIContent colorText = new GUIContent("Color", "");
+    private static readonly GUIContent gradientText = new GUIContent("Gradient", "");
     private static readonly GUIContent gradientTextureText = new GUIContent("Gradient Texture", "");
     private static readonly GUIContent modeText = new GUIContent("Mode", "");
     private static readonly GUIContent densityText = new GUIContent("Density", "");
     private static readonly GUIContent startDistanceText = new GUIContent("Start Distance", "");
     private static readonly GUIContent endDistanceText = new GUIContent("End Distance", "");
+
+    private static readonly int gradientTextureWidth = 128;
 
     private bool initializedWindow;
     private SerializedObject activeEnhancedFogSettingsSerializedObject;
@@ -31,6 +34,7 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private bool isEnabled;
     private EnhancedFogColorMode colorMode;
     private Color color;
+    private Gradient gradient;
     private Texture2D gradientTexture;
     private EnhancedFogMode mode;
     private float startDistance;
@@ -76,7 +80,11 @@ public class EnhancedFogSettingsWindow : EditorWindow {
             if (activeEnhancedFogSettings.colorMode == EnhancedFogColorMode.SingleColor) {
                 color = EditorGUILayout.ColorField(colorText, activeEnhancedFogSettings.color);
             } else {
-                gradientTexture = EditorGUILayout.ObjectField(gradientTextureText, gradientTexture, typeof(Texture2D)) as Texture2D;
+                EditorGUI.BeginChangeCheck(); {
+                    gradient = EditorGUILayout.GradientField(gradientText, activeEnhancedFogSettings.gradient);
+                } if (EditorGUI.EndChangeCheck()) {
+                    gradientTexture = GenerateGradientTexture(gradient, gradientTextureWidth);
+                }
             }
             mode = (EnhancedFogMode)EditorGUILayout.EnumPopup(modeText, activeEnhancedFogSettings.mode);
             if (activeEnhancedFogSettings.mode == EnhancedFogMode.Linear) {
@@ -145,5 +153,18 @@ public class EnhancedFogSettingsWindow : EditorWindow {
             activeEnhancedFogSettings.Render();
             SceneView.RepaintAll();
         }
+    }
+
+    private Texture2D GenerateGradientTexture(Gradient gradient, int textureWidth) {
+        Texture2D gradientTexture = new Texture2D(textureWidth, 1, TextureFormat.ARGB32, false );
+        gradientTexture.wrapMode = TextureWrapMode.Clamp;
+
+        for (int i = 0; i < textureWidth; i++) {
+            float progress = i / (textureWidth - 1.0f);
+            gradientTexture.SetPixel(i, 0, gradient.Evaluate(progress));
+        }
+
+        gradientTexture.Apply();
+        return gradientTexture;
     }
 }

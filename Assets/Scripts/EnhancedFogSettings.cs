@@ -4,6 +4,7 @@ public class EnhancedFogSettings : ScriptableObject {
     public bool isEnabled = false;
     public EnhancedFogColorMode colorMode = EnhancedFogColorMode.SingleColor;
     public Color color = Color.gray;
+    public Gradient gradient = new Gradient();
     public Texture2D gradientTexture;
     public EnhancedFogMode mode = EnhancedFogMode.Linear;
     public float density = 0.01f;
