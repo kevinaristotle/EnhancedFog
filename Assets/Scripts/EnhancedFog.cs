@@ -14,6 +14,7 @@ public static class EnhancedFog {
     private static bool m_isEnabled = false;
     private static EnhancedFogColorMode m_colorMode = EnhancedFogColorMode.SingleColor;
     private static Color m_color = Color.gray;
+    private static Gradient m_gradient = new Gradient();
     private static Texture2D m_gradientTexture;
     private static EnhancedFogMode m_mode = EnhancedFogMode.Linear;
     private static float m_density = 0.01f;
@@ -29,6 +30,7 @@ public static class EnhancedFog {
                 isEnabled = m_currentFogSettings.isEnabled;
                 colorMode = m_currentFogSettings.colorMode;
                 color = m_currentFogSettings.color;
+                gradient = m_currentFogSettings.gradient;
                 gradientTexture = m_currentFogSettings.gradientTexture;
                 mode = m_currentFogSettings.mode;
                 density = m_currentFogSettings.density;
@@ -59,6 +61,14 @@ public static class EnhancedFog {
         set {
             m_color = value;
             Shader.SetGlobalColor(ShaderPropertyID.g_EnhancedFogColor, value);
+        }
+    }
+
+    public static Gradient gradient {
+        get { return m_gradient; }
+        set { 
+            m_gradient = value;
+            gradientTexture = GenerateGradientTexture(value);
         }
     }
 
@@ -128,5 +138,18 @@ public static class EnhancedFog {
                     break;
             }
         }
+    }
+
+    private static Texture2D GenerateGradientTexture(Gradient gradient, int textureWidth = 128) {
+        Texture2D gradientTexture = new Texture2D(textureWidth, 1, TextureFormat.ARGB32, false );
+        gradientTexture.wrapMode = TextureWrapMode.Clamp;
+
+        for (int i = 0; i < textureWidth; i++) {
+            float progress = i / (textureWidth - 1.0f);
+            gradientTexture.SetPixel(i, 0, gradient.Evaluate(progress));
+        }
+
+        gradientTexture.Apply();
+        return gradientTexture;
     }
 }
