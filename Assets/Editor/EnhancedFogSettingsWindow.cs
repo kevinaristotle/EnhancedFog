@@ -76,7 +76,11 @@ public class EnhancedFogSettingsWindow : EditorWindow {
 
         EditorGUI.BeginChangeCheck(); {
             isEnabled = EditorGUILayout.Toggle(isEnabledText, activeEnhancedFogSettings.isEnabled);
-            colorMode = (EnhancedFogColorMode)EditorGUILayout.EnumPopup(colorModeText, activeEnhancedFogSettings.colorMode);
+            EditorGUI.BeginChangeCheck(); {
+                colorMode = (EnhancedFogColorMode)EditorGUILayout.EnumPopup(colorModeText, activeEnhancedFogSettings.colorMode);
+            } if (EditorGUI.EndChangeCheck()) {
+                gradientTexture = GenerateGradientTexture(activeEnhancedFogSettings.gradient, gradientTextureWidth);
+            }
             if (activeEnhancedFogSettings.colorMode == EnhancedFogColorMode.SingleColor) {
                 color = EditorGUILayout.ColorField(colorText, activeEnhancedFogSettings.color);
             } else {

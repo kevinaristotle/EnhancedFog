@@ -26,7 +26,6 @@ public static class EnhancedFog {
             m_currentFogSettings = value;
 
             if (m_currentFogSettings != null) {
-                Debug.Log("EnhancedFog: loaded currentFogSettings");
                 isEnabled = m_currentFogSettings.isEnabled;
                 colorMode = m_currentFogSettings.colorMode;
                 color = m_currentFogSettings.color;
