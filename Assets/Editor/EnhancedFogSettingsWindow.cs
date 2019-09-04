@@ -79,7 +79,7 @@ public class EnhancedFogSettingsWindow : EditorWindow {
             EditorGUI.BeginChangeCheck(); {
                 colorMode = (EnhancedFogColorMode)EditorGUILayout.EnumPopup(colorModeText, activeEnhancedFogSettings.colorMode);
             } if (EditorGUI.EndChangeCheck()) {
-                gradientTexture = GenerateGradientTexture(activeEnhancedFogSettings.gradient, gradientTextureWidth);
+                gradientTexture = GenerateGradientTexture(gradient, gradientTextureWidth);
             }
             if (activeEnhancedFogSettings.colorMode == EnhancedFogColorMode.SingleColor) {
                 color = EditorGUILayout.ColorField(colorText, activeEnhancedFogSettings.color);
@@ -102,6 +102,7 @@ public class EnhancedFogSettingsWindow : EditorWindow {
             activeEnhancedFogSettings.isEnabled = isEnabled;
             activeEnhancedFogSettings.colorMode = colorMode;
             activeEnhancedFogSettings.color = color;
+            activeEnhancedFogSettings.gradient = gradient;
             activeEnhancedFogSettings.gradientTexture = gradientTexture;
             activeEnhancedFogSettings.mode = mode;
             activeEnhancedFogSettings.startDistance = startDistance;
@@ -146,6 +147,16 @@ public class EnhancedFogSettingsWindow : EditorWindow {
         if (!activeEnhancedFogSettings) {
             return;
         }
+
+        isEnabled = activeEnhancedFogSettings.isEnabled;
+        colorMode = activeEnhancedFogSettings.colorMode;
+        color = activeEnhancedFogSettings.color;
+        gradient = activeEnhancedFogSettings.gradient;
+        gradientTexture = activeEnhancedFogSettings.gradientTexture;
+        mode = activeEnhancedFogSettings.mode;
+        startDistance = activeEnhancedFogSettings.startDistance;
+        endDistance = activeEnhancedFogSettings.endDistance;
+        density = activeEnhancedFogSettings.density;
 
         unityLogo = EditorGUIUtility.IconContent("BuildSettings.Editor.Small").image;
         string headerText = string.Join(blankspace, blankspace + scene.name, fogSettingsText);
