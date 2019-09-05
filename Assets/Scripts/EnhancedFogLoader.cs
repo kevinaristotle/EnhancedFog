@@ -18,11 +18,11 @@ public static class EnhancedFogLoader {
         return fogSettingsPath;
     }
 
-    private static EnhancedFogSettings CreateFogSettings(string assetDir) {
+    private static EnhancedFogSettings CreateFogSettingsInDirectory(string assetDir) {
         string assets = "Assets";
         string applicationDataPath = Application.dataPath;
         int applicationDataPathStringLen = applicationDataPath.Length;
-        string absoluteAssetDir = applicationDataPath.Remove(applicationDataPath.Length - assets.Length, assets.Length) + "/" + assetDir;
+        string absoluteAssetDir = applicationDataPath.Remove(applicationDataPath.Length - assets.Length, assets.Length) + assetDir;
         Debug.Log("Checking for directory: " + absoluteAssetDir);
         if (!System.IO.Directory.Exists(absoluteAssetDir)) {
             System.IO.Directory.CreateDirectory(absoluteAssetDir);
@@ -38,6 +38,7 @@ public static class EnhancedFogLoader {
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
         return fogSettingsAsset;
+        return null;
     }
 
     public static EnhancedFogSettings GetFogSettings(string scenePath)
@@ -57,29 +58,31 @@ public static class EnhancedFogLoader {
     }
 
     public static EnhancedFogSettings GetFogSettings(Scene scene) {
-        if (string.IsNullOrEmpty(scene.path)) {
+        return GetFogSettings(scene.path);
+    }
+
+    public static EnhancedFogSettings CreateFogSettings(string scenePath) {
+        Debug.Log("Creating fog settings at scene path: " + scenePath);
+        
+        if (string.IsNullOrEmpty(scenePath)) {
             return null;
         }
 
-        string fogSettingsPath = GetFogSettingsPath(scene.name, scene.path);
+        string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+
+        string fogSettingsPath = GetFogSettingsPath(sceneName, scenePath);
         EnhancedFogSettings fogSettings = (EnhancedFogSettings)AssetDatabase.LoadAssetAtPath(fogSettingsPath, typeof(EnhancedFogSettings));
+
+        if (!fogSettings) {
+            string fogSettingsDir = GetFogSettingsDir(sceneName, scenePath);
+            fogSettings = CreateFogSettingsInDirectory(fogSettingsDir);
+        }
+
         return fogSettings;
     }
 
     public static EnhancedFogSettings CreateFogSettings(Scene scene) {
-        if (string.IsNullOrEmpty(scene.path)) {
-            return null;
-        }
-
-        string fogSettingsPath = GetFogSettingsPath(scene.name, scene.path);
-        EnhancedFogSettings fogSettings = (EnhancedFogSettings)AssetDatabase.LoadAssetAtPath(fogSettingsPath, typeof(EnhancedFogSettings));
-
-        if (!fogSettings) {
-            string fogSettingsDir = GetFogSettingsDir(scene.name, scene.path);
-            fogSettings = CreateFogSettings(fogSettingsDir);
-        }
-
-        return fogSettings;
+        return CreateFogSettings(scene.path);
     }
 #else
     private static EnhancedFogSettingsContainer m_fogSettingsContainer;
