@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine.SceneManagement;
 
-public class EnhancedFogScenePostProcessor : MonoBehaviour
+public class EnhancedFogScenePostProcessor
 {
     [PostProcessScene]
     public static void OnPostprocessScene()

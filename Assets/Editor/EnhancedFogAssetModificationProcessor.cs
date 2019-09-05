@@ -1,7 +1,6 @@
 ﻿using System.IO;
-using UnityEditor;
 
-public class EnhancedFogAssetModificationProcessor : AssetModificationProcessor
+public class EnhancedFogAssetModificationProcessor : UnityEditor.AssetModificationProcessor
 {
     static void OnWillCreateAsset(string path)
     {
