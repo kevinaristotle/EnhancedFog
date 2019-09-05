@@ -26,8 +26,8 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private static readonly int gradientTextureWidth = 128;
 
     private bool initializedWindow;
-    private SerializedObject activeEnhancedFogSettingsSerializedObject;
-    private EnhancedFogSettings activeEnhancedFogSettings;
+    private SerializedObject fogSettingsSerializedObject;
+    private EnhancedFogSettings fogSettings;
     private Texture unityLogo;
     private GUIContent headerContent;
 
@@ -68,49 +68,49 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     }
 
     private void OnGUI() {
-        if (!activeEnhancedFogSettings) {
+        if (!fogSettings) {
             return;
         }
 
         EditorGUILayout.LabelField(headerContent, EditorStyles.boldLabel, GUILayout.Height(20));
 
         EditorGUI.BeginChangeCheck(); {
-            isEnabled = EditorGUILayout.Toggle(isEnabledText, activeEnhancedFogSettings.isEnabled);
+            isEnabled = EditorGUILayout.Toggle(isEnabledText, fogSettings.isEnabled);
             EditorGUI.BeginChangeCheck(); {
-                colorMode = (EnhancedFogColorMode)EditorGUILayout.EnumPopup(colorModeText, activeEnhancedFogSettings.colorMode);
+                colorMode = (EnhancedFogColorMode)EditorGUILayout.EnumPopup(colorModeText, fogSettings.colorMode);
             } if (EditorGUI.EndChangeCheck()) {
                 gradientTexture = GenerateGradientTexture(gradient, gradientTextureWidth);
             }
-            if (activeEnhancedFogSettings.colorMode == EnhancedFogColorMode.SingleColor) {
-                color = EditorGUILayout.ColorField(colorText, activeEnhancedFogSettings.color);
+            if (fogSettings.colorMode == EnhancedFogColorMode.SingleColor) {
+                color = EditorGUILayout.ColorField(colorText, fogSettings.color);
             } else {
                 EditorGUI.BeginChangeCheck(); {
-                    gradient = EditorGUILayout.GradientField(gradientText, activeEnhancedFogSettings.gradient);
+                    gradient = EditorGUILayout.GradientField(gradientText, fogSettings.gradient);
                 } if (EditorGUI.EndChangeCheck()) {
                     gradientTexture = GenerateGradientTexture(gradient, gradientTextureWidth);
                 }
             }
-            mode = (EnhancedFogMode)EditorGUILayout.EnumPopup(modeText, activeEnhancedFogSettings.mode);
-            if (activeEnhancedFogSettings.mode == EnhancedFogMode.Linear) {
-                startDistance = EditorGUILayout.FloatField(startDistanceText, activeEnhancedFogSettings.startDistance);
-                endDistance = EditorGUILayout.FloatField(endDistanceText, activeEnhancedFogSettings.endDistance);
+            mode = (EnhancedFogMode)EditorGUILayout.EnumPopup(modeText, fogSettings.mode);
+            if (fogSettings.mode == EnhancedFogMode.Linear) {
+                startDistance = EditorGUILayout.FloatField(startDistanceText, fogSettings.startDistance);
+                endDistance = EditorGUILayout.FloatField(endDistanceText, fogSettings.endDistance);
             } else {
-                density = EditorGUILayout.FloatField(densityText, activeEnhancedFogSettings.density);
+                density = EditorGUILayout.FloatField(densityText, fogSettings.density);
             }
         } if (EditorGUI.EndChangeCheck()) {
-            Undo.RecordObject(activeEnhancedFogSettings, "Changed Enhanced Fog Settings");
-            activeEnhancedFogSettings.isEnabled = isEnabled;
-            activeEnhancedFogSettings.colorMode = colorMode;
-            activeEnhancedFogSettings.color = color;
-            activeEnhancedFogSettings.gradient = gradient;
-            activeEnhancedFogSettings.gradientTexture = gradientTexture;
-            activeEnhancedFogSettings.mode = mode;
-            activeEnhancedFogSettings.startDistance = startDistance;
-            activeEnhancedFogSettings.endDistance = endDistance;
-            activeEnhancedFogSettings.density = density;
-            activeEnhancedFogSettings.Render();
+            Undo.RecordObject(fogSettings, "Changed Enhanced Fog Settings");
+            fogSettings.isEnabled = isEnabled;
+            fogSettings.colorMode = colorMode;
+            fogSettings.color = color;
+            fogSettings.gradient = gradient;
+            fogSettings.gradientTexture = gradientTexture;
+            fogSettings.mode = mode;
+            fogSettings.startDistance = startDistance;
+            fogSettings.endDistance = endDistance;
+            fogSettings.density = density;
+            fogSettings.Render();
             SceneView.RepaintAll();
-            EditorUtility.SetDirty(activeEnhancedFogSettings);
+            EditorUtility.SetDirty(fogSettings);
             AssetDatabase.SaveAssets();
         }
     }
@@ -143,20 +143,21 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     }
 
     private void Initialize(Scene scene) {
-        activeEnhancedFogSettings = EnhancedFogLoader.GetFogSettings(scene);
-        if (!activeEnhancedFogSettings) {
-            return;
+        fogSettings = EnhancedFogLoader.GetFogSettings(scene);
+
+        if (!fogSettings) {
+            fogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
         }
 
-        isEnabled = activeEnhancedFogSettings.isEnabled;
-        colorMode = activeEnhancedFogSettings.colorMode;
-        color = activeEnhancedFogSettings.color;
-        gradient = activeEnhancedFogSettings.gradient;
-        gradientTexture = activeEnhancedFogSettings.gradientTexture;
-        mode = activeEnhancedFogSettings.mode;
-        startDistance = activeEnhancedFogSettings.startDistance;
-        endDistance = activeEnhancedFogSettings.endDistance;
-        density = activeEnhancedFogSettings.density;
+        isEnabled = fogSettings.isEnabled;
+        colorMode = fogSettings.colorMode;
+        color = fogSettings.color;
+        gradient = fogSettings.gradient;
+        gradientTexture = fogSettings.gradientTexture;
+        mode = fogSettings.mode;
+        startDistance = fogSettings.startDistance;
+        endDistance = fogSettings.endDistance;
+        density = fogSettings.density;
 
         unityLogo = EditorGUIUtility.IconContent("BuildSettings.Editor.Small").image;
         string headerText = string.Join(blankspace, blankspace + scene.name, fogSettingsText);
@@ -164,8 +165,8 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     }
 
     private void OnUndoRedo() {
-        if (activeEnhancedFogSettings) {
-            activeEnhancedFogSettings.Render();
+        if (fogSettings) {
+            fogSettings.Render();
             SceneView.RepaintAll();
         }
     }
