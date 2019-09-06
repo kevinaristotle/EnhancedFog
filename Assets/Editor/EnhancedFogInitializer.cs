@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,12 +11,21 @@ using UnityEngine.SceneManagement;
 public static class EnhancedFogInitializer {
     private static EnhancedFogSettings fogSettings;
 
+    private static bool attemptingToCreateFogSettings;
+    private static string recentlyCreatedAssetPath;
+
     static EnhancedFogInitializer() {
         Debug.Log("EnhancedFogInitializer");
         EditorSceneManager.sceneOpened += OnSceneOpened;
         SceneManager.sceneLoaded += OnSceneLoaded;
         EditorApplication.update += InitialUpdate;
         EditorApplication.playModeStateChanged += OnPlaymodeStateChanged;
+        EditorApplication.projectChanged += OnProjectChanged;
+    }
+
+    public static void CreateFogSettingsForCreatedAsset(string path) {
+        attemptingToCreateFogSettings = true;
+        recentlyCreatedAssetPath = path;
     }
 
     private static void InitialUpdate() {
@@ -46,6 +56,26 @@ public static class EnhancedFogInitializer {
         }
     }
 
+    private static void OnProjectChanged() {
+        if (attemptingToCreateFogSettings) {
+            string path = recentlyCreatedAssetPath;
+            string sceneDir = Path.GetDirectoryName(path);
+            string sceneName = Path.GetFileNameWithoutExtension(path);
+            string scenePath = Path.Combine(sceneDir, sceneName);
+
+            if (!IsAssetFolderPathADirectory(scenePath)) {
+                EnhancedFogSettings fogSettings = EnhancedFogLoader.GetFogSettings(scenePath);
+                if (!fogSettings) {
+                    fogSettings = EnhancedFogLoader.CreateFogSettings(scenePath);
+                }
+            }
+        }
+
+        attemptingToCreateFogSettings = false;
+        recentlyCreatedAssetPath = String.Empty;
+
+    }
+
     private static void RenderFogSettings() {
         if (fogSettings) {
             fogSettings.Render();
@@ -59,5 +89,14 @@ public static class EnhancedFogInitializer {
         }
 
         return loadedFogSettings;
+    }
+
+    private static bool IsAssetFolderPathADirectory(string path) {
+        string assets = "Assets";
+        string applicationDataPath = Application.dataPath;
+        int applicationDataPathStringLen = applicationDataPath.Length;
+        string absoluteAssetDir = applicationDataPath.Remove(applicationDataPath.Length - assets.Length, assets.Length) + path;
+
+        return Directory.Exists(absoluteAssetDir);
     }
 }
