@@ -94,7 +94,6 @@ public static class EnhancedFogInitializer {
     private static bool IsAssetFolderPathADirectory(string path) {
         string assets = "Assets";
         string applicationDataPath = Application.dataPath;
-        int applicationDataPathStringLen = applicationDataPath.Length;
         string absoluteAssetDir = applicationDataPath.Remove(applicationDataPath.Length - assets.Length, assets.Length) + path;
 
         return Directory.Exists(absoluteAssetDir);
