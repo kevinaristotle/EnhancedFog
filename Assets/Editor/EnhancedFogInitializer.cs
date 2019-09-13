@@ -30,7 +30,7 @@ public static class EnhancedFogInitializer {
 
     private static void InitialUpdate() {
         Scene scene = SceneManager.GetActiveScene();
-        fogSettings = GetFogSettings(scene);
+        fogSettings = GetOrCreateFogSettings(scene);
         RenderFogSettings();
         EditorApplication.update -= InitialUpdate;
     }
@@ -38,20 +38,20 @@ public static class EnhancedFogInitializer {
     private static void OnSceneOpened(Scene scene, OpenSceneMode mode) {
         Debug.Log("OnSceneOpened");
         Debug.Log("SceneName = " + scene.name);
-        fogSettings = GetFogSettings(scene);
+        fogSettings = GetOrCreateFogSettings(scene);
         RenderFogSettings();
     }
 
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         if (mode == LoadSceneMode.Single) {
-            EnhancedFog.currentFogSettings = EnhancedFogLoader.GetFogSettings(scene);
+            EnhancedFog.currentFogSettings = GetOrCreateFogSettings(scene);
         }
     }
 
     private static void OnPlaymodeStateChanged(PlayModeStateChange state) {
         if (state == PlayModeStateChange.EnteredEditMode) {
             Scene activeScene = SceneManager.GetActiveScene();
-            fogSettings = GetFogSettings(activeScene);
+            fogSettings = GetOrCreateFogSettings(activeScene);
             RenderFogSettings();
         }
     }
@@ -64,10 +64,7 @@ public static class EnhancedFogInitializer {
             string scenePath = Path.Combine(sceneDir, sceneName);
 
             if (!IsAssetFolderPathADirectory(scenePath)) {
-                EnhancedFogSettings fogSettings = EnhancedFogLoader.GetFogSettings(scenePath);
-                if (!fogSettings) {
-                    fogSettings = EnhancedFogLoader.CreateFogSettings(scenePath);
-                }
+                EnhancedFogSettings fogSettings = GetOrCreateFogSettings(scenePath);
             }
         }
 
@@ -82,13 +79,21 @@ public static class EnhancedFogInitializer {
         }
     }
 
-    private static EnhancedFogSettings GetFogSettings(Scene scene) {
-        EnhancedFogSettings loadedFogSettings = EnhancedFogLoader.GetFogSettings(scene);
+    public static EnhancedFogSettings GetOrCreateFogSettings(string scenePath) {
+        EnhancedFogSettings loadedFogSettings = EnhancedFogLoader.GetFogSettings(scenePath);
         if (!loadedFogSettings) {
-            loadedFogSettings = EnhancedFogLoader.CreateFogSettings(scene);
+            if (EnhancedFogSettingsProvider.autoGenerateFogSettings) {
+                loadedFogSettings = EnhancedFogLoader.CreateFogSettings(scenePath);
+            } else {
+                loadedFogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
+            }
         }
 
         return loadedFogSettings;
+    }
+
+    public static EnhancedFogSettings GetOrCreateFogSettings(Scene scene) {
+       return GetOrCreateFogSettings(scene.path);
     }
 
     private static bool IsAssetFolderPathADirectory(string path) {

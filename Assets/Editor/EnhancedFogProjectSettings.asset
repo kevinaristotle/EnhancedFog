@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: EnhancedFogProjectSettings
   m_EditorClassIdentifier: Assembly-CSharp-Editor::EnhancedFogSettingsProvider/EnhancedFogProjectSettings
-  autoGenerateFogSettings: 1
+  m_autoGenerateFogSettings: 1

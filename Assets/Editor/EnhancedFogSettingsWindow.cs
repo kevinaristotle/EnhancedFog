@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEditor;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
@@ -12,6 +13,8 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private static readonly string blankspace = " ";
     private static readonly string fogSettingsText = "Fog Settings";
     private static readonly string windowTitle = "Enhanced Fog";
+
+    private static readonly string helpBoxText = "A Fog Settings asset does not exist on disk for this scene. Would you like to create one?";
 
     private static readonly GUIContent isEnabledText = new GUIContent("Fog Enabled", "");
     private static readonly GUIContent colorModeText = new GUIContent("Color Mode", "");
@@ -27,7 +30,9 @@ public class EnhancedFogSettingsWindow : EditorWindow {
 
     private bool initializedWindow;
     private SerializedObject fogSettingsSerializedObject;
+    private bool fogSettingsNotFoundOnDisk;
     private EnhancedFogSettings fogSettings;
+    private Scene currentScene;
     private Texture unityLogo;
     private GUIContent headerContent;
 
@@ -70,6 +75,10 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     private void OnGUI() {
         if (!fogSettings) {
             return;
+        }
+
+        if (fogSettingsNotFoundOnDisk && !String.IsNullOrEmpty(currentScene.path)) {
+            DrawCreateFogSettingsAssetButton();
         }
 
         EditorGUILayout.LabelField(headerContent, EditorStyles.boldLabel, GUILayout.Height(20));
@@ -115,6 +124,21 @@ public class EnhancedFogSettingsWindow : EditorWindow {
         }
     }
 
+    private void DrawCreateFogSettingsAssetButton() {
+        EditorGUILayout.HelpBox(helpBoxText, MessageType.Warning);
+        if (GUILayout.Button("Create Fog Settings Asset")) {
+            CreateFogSettingsAsset();
+        }
+        EditorGUILayout.Space();
+    }
+
+    private void CreateFogSettingsAsset() {
+        EnhancedFogSettings newlyCreatedFogSettings = EnhancedFogLoader.CreateFogSettings(currentScene.path);
+        if (newlyCreatedFogSettings != null) {
+            Initialize(currentScene);
+        }
+    }
+
     private void OnSceneOpened(Scene scene, OpenSceneMode mode) {
         Debug.Log("Scene Opened!");
         Initialize(scene);
@@ -144,9 +168,13 @@ public class EnhancedFogSettingsWindow : EditorWindow {
 
     private void Initialize(Scene scene) {
         fogSettings = EnhancedFogLoader.GetFogSettings(scene);
+        currentScene = scene;
 
         if (!fogSettings) {
+            fogSettingsNotFoundOnDisk = true;
             fogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
+        } else {
+            fogSettingsNotFoundOnDisk = false;
         }
 
         isEnabled = fogSettings.isEnabled;
