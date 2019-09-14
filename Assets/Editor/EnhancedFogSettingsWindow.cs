@@ -107,35 +107,7 @@ public class EnhancedFogSettingsWindow : EditorWindow {
                 density = EditorGUILayout.FloatField(densityText, fogSettings.density);
             }
         } if (EditorGUI.EndChangeCheck()) {
-            Undo.RecordObject(fogSettings, "Changed Enhanced Fog Settings");
-            fogSettings.isEnabled = isEnabled;
-            fogSettings.colorMode = colorMode;
-            fogSettings.color = color;
-            fogSettings.gradient = gradient;
-            fogSettings.gradientTexture = gradientTexture;
-            fogSettings.mode = mode;
-            fogSettings.startDistance = startDistance;
-            fogSettings.endDistance = endDistance;
-            fogSettings.density = density;
-            fogSettings.Render();
-            SceneView.RepaintAll();
-            EditorUtility.SetDirty(fogSettings);
-            AssetDatabase.SaveAssets();
-        }
-    }
-
-    private void DrawCreateFogSettingsAssetButton() {
-        EditorGUILayout.HelpBox(helpBoxText, MessageType.Warning);
-        if (GUILayout.Button("Create Fog Settings Asset")) {
-            CreateFogSettingsAsset();
-        }
-        EditorGUILayout.Space();
-    }
-
-    private void CreateFogSettingsAsset() {
-        EnhancedFogSettings newlyCreatedFogSettings = EnhancedFogLoader.CreateFogSettings(currentScene.path);
-        if (newlyCreatedFogSettings != null) {
-            Initialize(currentScene);
+            ApplyWindowSettingsToFogSettings(fogSettings);
         }
     }
 
@@ -197,6 +169,40 @@ public class EnhancedFogSettingsWindow : EditorWindow {
             fogSettings.Render();
             SceneView.RepaintAll();
         }
+    }
+
+    private void DrawCreateFogSettingsAssetButton() {
+        EditorGUILayout.HelpBox(helpBoxText, MessageType.Warning);
+        if (GUILayout.Button("Create Fog Settings Asset")) {
+            CreateFogSettingsAsset();
+        }
+        EditorGUILayout.Space();
+    }
+
+    private void CreateFogSettingsAsset() {
+        EnhancedFogSettings newlyCreatedFogSettings = EnhancedFogLoader.CreateFogSettings(currentScene.path);
+        ApplyWindowSettingsToFogSettings(newlyCreatedFogSettings);
+
+        if (newlyCreatedFogSettings != null) {
+            Initialize(currentScene);
+        }
+    }
+
+    private void ApplyWindowSettingsToFogSettings(EnhancedFogSettings fogSettings) {
+    	Undo.RecordObject(fogSettings, "Changed Enhanced Fog Settings");
+    	fogSettings.isEnabled = isEnabled;
+        fogSettings.colorMode = colorMode;
+        fogSettings.color = color;
+        fogSettings.gradient = gradient;
+        fogSettings.gradientTexture = gradientTexture;
+        fogSettings.mode = mode;
+        fogSettings.startDistance = startDistance;
+        fogSettings.endDistance = endDistance;
+        fogSettings.density = density;
+        fogSettings.Render();
+        SceneView.RepaintAll();
+        EditorUtility.SetDirty(fogSettings);
+        AssetDatabase.SaveAssets();
     }
 
     private Texture2D GenerateGradientTexture(Gradient gradient, int textureWidth) {
