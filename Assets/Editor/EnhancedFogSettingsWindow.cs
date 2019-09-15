@@ -4,11 +4,6 @@ using UnityEditor;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 
-//TODO: When a new scene is opened EnhancedFogSettingsWindow doesn't show anything because
-//EnhancedFogSettings doesn't exist for that scene. EnhancedFogSettings are only created when
-//a scene is saved. So to handle this case, temporary settings should be created, and those
-//temporary settings should be saved to disk when the new scene is saved for the first time.
-
 public class EnhancedFogSettingsWindow : EditorWindow {
     private static readonly string blankspace = " ";
     private static readonly string fogSettingsText = "Fog Settings";
@@ -145,6 +140,15 @@ public class EnhancedFogSettingsWindow : EditorWindow {
         if (!fogSettings) {
             fogSettingsNotFoundOnDisk = true;
             fogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
+            fogSettings.isEnabled = EnhancedFog.isEnabled;
+            fogSettings.colorMode = EnhancedFog.colorMode;
+            fogSettings.color = EnhancedFog.color;
+            fogSettings.gradient = EnhancedFog.gradient;
+            fogSettings.gradientTexture = EnhancedFog.gradientTexture;
+            fogSettings.mode = EnhancedFog.mode;
+            fogSettings.startDistance = EnhancedFog.startDistance;
+            fogSettings.endDistance = EnhancedFog.endDistance;
+            fogSettings.density = EnhancedFog.density;
         } else {
             fogSettingsNotFoundOnDisk = false;
         }
@@ -189,8 +193,8 @@ public class EnhancedFogSettingsWindow : EditorWindow {
     }
 
     private void ApplyWindowSettingsToFogSettings(EnhancedFogSettings fogSettings) {
-    	Undo.RecordObject(fogSettings, "Changed Enhanced Fog Settings");
-    	fogSettings.isEnabled = isEnabled;
+        Undo.RecordObject(fogSettings, "Changed Enhanced Fog Settings");
+        fogSettings.isEnabled = isEnabled;
         fogSettings.colorMode = colorMode;
         fogSettings.color = color;
         fogSettings.gradient = gradient;
