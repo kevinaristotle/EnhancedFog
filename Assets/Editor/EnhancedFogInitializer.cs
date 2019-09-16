@@ -16,6 +16,7 @@ public static class EnhancedFogInitializer {
 
     static EnhancedFogInitializer() {
         Debug.Log("EnhancedFogInitializer");
+        EditorSceneManager.newSceneCreated += OnNewSceneCreated;
         EditorSceneManager.sceneOpened += OnSceneOpened;
         SceneManager.sceneLoaded += OnSceneLoaded;
         EditorApplication.update += InitialUpdate;
@@ -33,6 +34,12 @@ public static class EnhancedFogInitializer {
         fogSettings = GetOrCreateFogSettings(scene);
         RenderFogSettings();
         EditorApplication.update -= InitialUpdate;
+    }
+
+    private static void OnNewSceneCreated(Scene scene, NewSceneSetup setup, NewSceneMode mode) {
+        fogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
+        EnhancedFog.currentFogSettings = fogSettings;
+        fogSettings.Render();
     }
 
     private static void OnSceneOpened(Scene scene, OpenSceneMode mode) {
