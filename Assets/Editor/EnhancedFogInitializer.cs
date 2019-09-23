@@ -9,8 +9,6 @@ using UnityEngine.SceneManagement;
 
 [InitializeOnLoad]
 public static class EnhancedFogInitializer {
-    private static EnhancedFogSettings fogSettings;
-
     private static bool attemptingToCreateFogSettings;
     private static string recentlyCreatedAssetPath;
 
@@ -31,35 +29,31 @@ public static class EnhancedFogInitializer {
 
     private static void InitialUpdate() {
         Scene scene = SceneManager.GetActiveScene();
-        fogSettings = GetOrCreateFogSettings(scene);
-        RenderFogSettings();
+        EnhancedFog.ApplyFogSettings(GetOrCreateFogSettings(scene));
         EditorApplication.update -= InitialUpdate;
     }
 
     private static void OnNewSceneCreated(Scene scene, NewSceneSetup setup, NewSceneMode mode) {
-        fogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
-        EnhancedFog.currentFogSettings = fogSettings;
-        fogSettings.Render();
+        EnhancedFogSettings fogSettings = ScriptableObject.CreateInstance(typeof(EnhancedFogSettings)) as EnhancedFogSettings;
+        EnhancedFog.ApplyFogSettings(fogSettings);
     }
 
     private static void OnSceneOpened(Scene scene, OpenSceneMode mode) {
         Debug.Log("OnSceneOpened");
         Debug.Log("SceneName = " + scene.name);
-        fogSettings = GetOrCreateFogSettings(scene);
-        RenderFogSettings();
+        EnhancedFog.ApplyFogSettings(GetOrCreateFogSettings(scene));
     }
 
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         if (mode == LoadSceneMode.Single) {
-            EnhancedFog.currentFogSettings = GetOrCreateFogSettings(scene);
+            EnhancedFog.ApplyFogSettings(GetOrCreateFogSettings(scene));
         }
     }
 
     private static void OnPlaymodeStateChanged(PlayModeStateChange state) {
         if (state == PlayModeStateChange.EnteredEditMode) {
             Scene activeScene = SceneManager.GetActiveScene();
-            fogSettings = GetOrCreateFogSettings(activeScene);
-            RenderFogSettings();
+            EnhancedFog.ApplyFogSettings(GetOrCreateFogSettings(activeScene));
         }
     }
 
@@ -78,12 +72,6 @@ public static class EnhancedFogInitializer {
         attemptingToCreateFogSettings = false;
         recentlyCreatedAssetPath = String.Empty;
 
-    }
-
-    private static void RenderFogSettings() {
-        if (fogSettings) {
-            fogSettings.Render();
-        }
     }
 
     public static EnhancedFogSettings GetOrCreateFogSettings(string scenePath) {

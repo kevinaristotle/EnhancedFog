@@ -10,7 +10,7 @@ public class EnhancedFogSettingsContainer : MonoBehaviour
     private void Awake()
     {
         DontDestroyOnLoad(this);
-        EnhancedFog.currentFogSettings = fogSettings[0];
+        EnhancedFog.ApplyFogSettings(fogSettings[0]);
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -18,7 +18,7 @@ public class EnhancedFogSettingsContainer : MonoBehaviour
     {
         if (mode == LoadSceneMode.Single)
         {
-            EnhancedFog.currentFogSettings = fogSettings[scene.buildIndex];
+            EnhancedFog.ApplyFogSettings(fogSettings[scene.buildIndex]);
         }
     }
 }

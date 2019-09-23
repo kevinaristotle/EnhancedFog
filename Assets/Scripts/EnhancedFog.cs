@@ -8,9 +8,6 @@ public static class EnhancedFog {
         public static readonly int g_EnhancedFogColorMode = Shader.PropertyToID("g_EnhancedFogColorMode");
     }
 
-    private static EnhancedFogSettingsContainer m_fogSettingsContainer;
-    private static EnhancedFogSettings m_currentFogSettings;
-
     private static bool m_isEnabled = false;
     private static EnhancedFogColorMode m_colorMode = EnhancedFogColorMode.SingleColor;
     private static Color m_color = Color.gray;
@@ -21,21 +18,17 @@ public static class EnhancedFog {
     private static float m_startDistance = 0.0f;
     private static float m_endDistance = 100.0f;
 
-    public static EnhancedFogSettings currentFogSettings {
-        set {
-            m_currentFogSettings = value;
-
-            if (m_currentFogSettings != null) {
-                isEnabled = m_currentFogSettings.isEnabled;
-                colorMode = m_currentFogSettings.colorMode;
-                color = m_currentFogSettings.color;
-                gradient = m_currentFogSettings.gradient;
-                gradientTexture = m_currentFogSettings.gradientTexture;
-                mode = m_currentFogSettings.mode;
-                density = m_currentFogSettings.density;
-                startDistance = m_currentFogSettings.startDistance;
-                endDistance = m_currentFogSettings.endDistance;
-            }
+    public static void ApplyFogSettings(EnhancedFogSettings fogSettings) {
+        if (fogSettings != null) {
+            isEnabled = fogSettings.isEnabled;
+            colorMode = fogSettings.colorMode;
+            color = fogSettings.color;
+            gradient = fogSettings.gradient;
+            gradientTexture = fogSettings.gradientTexture;
+            mode = fogSettings.mode;
+            density = fogSettings.density;
+            startDistance = fogSettings.startDistance;
+            endDistance = fogSettings.endDistance;
         }
     }
 

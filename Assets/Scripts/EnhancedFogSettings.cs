@@ -12,6 +12,6 @@ public class EnhancedFogSettings : ScriptableObject {
     public float endDistance = 100.0f;
 
     public void Render() {
-        EnhancedFog.currentFogSettings = this;
+        EnhancedFog.ApplyFogSettings(this);
     }
 }
